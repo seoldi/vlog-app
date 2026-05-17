@@ -412,7 +412,7 @@ body {
 
 /* Month nav */
 .cal-header {
-    padding: 8px 20px 16px;
+    padding: 16px 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
