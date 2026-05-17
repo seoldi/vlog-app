@@ -1,4 +1,4 @@
-const CACHE = 'vlog-v1';
+const CACHE = 'vlog-v2';
 const ASSETS = [
   './calendar.html',
   './date-detail.html',
@@ -26,8 +26,15 @@ self.addEventListener('activate', e => {
   self.clients.claim();
 });
 
+// 네트워크 우선 → 오프라인 시 캐시 사용
 self.addEventListener('fetch', e => {
   e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request))
+    fetch(e.request)
+      .then(response => {
+        const clone = response.clone();
+        caches.open(CACHE).then(c => c.put(e.request, clone));
+        return response;
+      })
+      .catch(() => caches.match(e.request))
   );
 });
