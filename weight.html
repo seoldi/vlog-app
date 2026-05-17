@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vlog — 몸무게</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+<body>
+
+<div class="phone">
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="status-time">9:41</span>
+    <div class="status-icons">
+      <svg viewBox="0 0 17 12" width="17" height="12" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="8" width="3" height="4" rx="1"/><rect x="4.5" y="5.5" width="3" height="6.5" rx="1"/>
+        <rect x="9" y="3" width="3" height="9" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/>
+      </svg>
+      <svg viewBox="0 0 16 12" width="18" height="12" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="8" cy="10.5" r="1.5" fill="#1a1a1a"/>
+        <path d="M4.5 7.5C5.5 6.4 6.7 5.8 8 5.8s2.5.6 3.5 1.7" stroke-width="1.2" fill="none" stroke="#1a1a1a" stroke-linecap="round"/>
+        <path d="M1.5 4.8C3.2 3 5.5 2 8 2s4.8 1 6.5 2.8" stroke-width="1.2" fill="none" stroke="#1a1a1a" stroke-linecap="round"/>
+      </svg>
+      <div class="battery-icon">
+        <div class="battery-body"><div class="battery-fill"></div></div>
+        <div class="battery-nib"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content content--padded">
+
+    <!-- Header -->
+    <div class="page-header">
+      <h2>몸무게 추이</h2>
+      <span class="page-header-sub">2026년 5월</span>
+    </div>
+
+    <!-- Period Selector -->
+    <div class="period-wrap">
+      <button class="period-btn">1주</button>
+      <button class="period-btn active">1개월</button>
+      <button class="period-btn">3개월</button>
+      <button class="period-btn">전체</button>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-row">
+      <div class="sum-card accent">
+        <span class="sum-card-label">현재</span>
+        <div>
+          <span class="sum-card-val">58.4</span>
+          <span class="sum-card-unit">kg</span>
+        </div>
+        <div class="sum-change accent-down">▼ 1.8 kg</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;flex:1">
+        <div class="sum-card" style="flex:none">
+          <span class="sum-card-label">이번달 변화</span>
+          <div>
+            <span class="sum-card-val" style="font-size:17px;color:var(--green)">▼ 1.8</span>
+            <span class="sum-card-unit">kg</span>
+          </div>
+        </div>
+        <div class="sum-card" style="flex:none">
+          <span class="sum-card-label">최저</span>
+          <div>
+            <span class="sum-card-val" style="font-size:17px">57.9</span>
+            <span class="sum-card-unit">kg</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="chart-card">
+      <div class="chart-top">
+        <span class="chart-title">체중 그래프</span>
+        <span class="chart-range">5/1 — 5/15</span>
+      </div>
+      <div class="chart-svg-wrap">
+        <!--
+          Data (kg): 5/2=58.9, 5/5=58.8, 5/7=59.1, 5/8=58.5, 5/9=58.5, 5/11=58.5, 5/12=58.7, 5/14=58.4
+          Y range: 57.5 ~ 59.5  →  height 120px  →  1kg = 60px
+          X: 0..310 across 8 points
+        -->
+        <svg viewBox="0 0 320 130" xmlns="http://www.w3.org/2000/svg">
+          <!-- Grid lines -->
+          <line x1="32" y1="10"  x2="316" y2="10"  stroke="#f0ede8" stroke-width="1"/>
+          <line x1="32" y1="40"  x2="316" y2="40"  stroke="#f0ede8" stroke-width="1"/>
+          <line x1="32" y1="70"  x2="316" y2="70"  stroke="#f0ede8" stroke-width="1"/>
+          <line x1="32" y1="100" x2="316" y2="100" stroke="#f0ede8" stroke-width="1"/>
+          <line x1="32" y1="130" x2="316" y2="130" stroke="#f0ede8" stroke-width="1"/>
+
+          <!-- Y labels: 59.5 / 59 / 58.5 / 58 / 57.5 -->
+          <text x="0"  y="13"  font-size="9" fill="#c0bdb8" font-family="Inter,sans-serif" font-weight="500">59.5</text>
+          <text x="2"  y="43"  font-size="9" fill="#c0bdb8" font-family="Inter,sans-serif" font-weight="500">59.0</text>
+          <text x="2"  y="73"  font-size="9" fill="#c0bdb8" font-family="Inter,sans-serif" font-weight="500">58.5</text>
+          <text x="2"  y="103" font-size="9" fill="#c0bdb8" font-family="Inter,sans-serif" font-weight="500">58.0</text>
+          <text x="2"  y="133" font-size="9" fill="#c0bdb8" font-family="Inter,sans-serif" font-weight="500">57.5</text>
+
+          <!-- Area fill -->
+          <!-- Points (x, y): 59.5=10, 58.9=46, 58.8=52, 59.1=34, 58.5=70, 58.5=70, 58.7=58, 58.4=76 -->
+          <!-- x positions: 32, 72, 112, 152, 192, 232, 272, 312 -->
+          <defs>
+            <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stop-color="#1A1A1A" stop-opacity="0.15"/>
+              <stop offset="100%" stop-color="#1A1A1A" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <path d="M32,46 C52,46 62,52 72,52 C92,52 102,34 112,34 C132,34 142,70 152,70 C172,70 182,70 192,70 C212,70 222,58 232,58 C252,58 262,76 272,76 L272,130 L32,130 Z"
+                fill="url(#areaGrad)"/>
+
+          <!-- Line -->
+          <path d="M32,46 C52,46 62,52 72,52 C92,52 102,34 112,34 C132,34 142,70 152,70 C172,70 182,70 192,70 C212,70 222,58 232,58 C252,58 262,76 272,76"
+                fill="none" stroke="#1A1A1A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+
+          <!-- Data points -->
+          <circle cx="32"  cy="46" r="3.5" fill="#fff" stroke="#1A1A1A" stroke-width="2"/>
+          <circle cx="72"  cy="52" r="3.5" fill="#fff" stroke="#1A1A1A" stroke-width="2"/>
+          <circle cx="112" cy="34" r="3.5" fill="#fff" stroke="#1A1A1A" stroke-width="2"/>
+          <circle cx="152" cy="70" r="3.5" fill="#fff" stroke="#1A1A1A" stroke-width="2"/>
+          <circle cx="192" cy="70" r="3.5" fill="#fff" stroke="#1A1A1A" stroke-width="2"/>
+          <circle cx="232" cy="58" r="3.5" fill="#fff" stroke="#1A1A1A" stroke-width="2"/>
+          <circle cx="272" cy="76" r="4.5" fill="#1A1A1A" stroke="#fff" stroke-width="2.5"/>
+
+          <!-- Today label -->
+          <text x="258" y="96" font-size="9" fill="#1A1A1A" font-family="Inter,sans-serif" font-weight="700">58.4</text>
+
+          <!-- X labels -->
+          <text x="25"  y="120" font-size="9" fill="#c0bdb8" font-family="Inter,sans-serif" font-weight="500">2</text>
+          <text x="65"  y="120" font-size="9" fill="#c0bdb8" font-family="Inter,sans-serif" font-weight="500">5</text>
+          <text x="105" y="120" font-size="9" fill="#c0bdb8" font-family="Inter,sans-serif" font-weight="500">7</text>
+          <text x="145" y="120" font-size="9" fill="#c0bdb8" font-family="Inter,sans-serif" font-weight="500">8</text>
+          <text x="185" y="120" font-size="9" fill="#c0bdb8" font-family="Inter,sans-serif" font-weight="500">11</text>
+          <text x="225" y="120" font-size="9" fill="#c0bdb8" font-family="Inter,sans-serif" font-weight="500">12</text>
+          <text x="264" y="120" font-size="9" fill="#1A1A1A" font-family="Inter,sans-serif" font-weight="700">15</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Records List -->
+    <div class="records-card">
+      <div class="records-header">
+        <span class="records-title">최근 기록</span>
+        <span class="records-count">이번달 6일</span>
+      </div>
+
+      <div class="record-row">
+        <div class="record-dot"></div>
+        <span class="record-date">5월 15일<span class="day-label">토</span></span>
+        <span class="record-kg">58.4 kg</span>
+        <span class="record-diff down">▼ 0.3</span>
+      </div>
+      <div class="record-row">
+        <div class="record-dot"></div>
+        <span class="record-date">5월 12일<span class="day-label">화</span></span>
+        <span class="record-kg">58.7 kg</span>
+        <span class="record-diff up">▲ 0.2</span>
+      </div>
+      <div class="record-row">
+        <div class="record-dot"></div>
+        <span class="record-date">5월 11일<span class="day-label">월</span></span>
+        <span class="record-kg">58.5 kg</span>
+        <span class="record-diff down">▼ 0.6</span>
+      </div>
+      <div class="record-row">
+        <div class="record-dot"></div>
+        <span class="record-date">5월 9일<span class="day-label">토</span></span>
+        <span class="record-kg">59.1 kg</span>
+        <span class="record-diff up">▲ 0.3</span>
+      </div>
+      <div class="record-row">
+        <div class="record-dot"></div>
+        <span class="record-date">5월 7일<span class="day-label">수</span></span>
+        <span class="record-kg">58.8 kg</span>
+        <span class="record-diff down">▼ 0.1</span>
+      </div>
+      <div class="record-row">
+        <div class="record-dot"></div>
+        <span class="record-date">5월 2일<span class="day-label">금</span></span>
+        <span class="record-kg">58.9 kg</span>
+        <span class="record-diff up">▲ 0.2</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <div class="tab-item">
+      <div class="tab-icon">
+        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="14" height="11" rx="2"/><path d="M16 7l5-3v12l-5-3"/></svg>
+      </div>
+      편집
+    </div>
+    <div class="tab-item">
+      <div class="tab-icon">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+      </div>
+      캘린더
+    </div>
+    <div class="tab-item active">
+      <div class="tab-icon">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </div>
+      몸무게
+    </div>
+  </div>
+
+</div>
+
+<script>
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>

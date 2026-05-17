@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vlog — 캘린더</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+<body>
+
+<div class="phone">
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="status-time">9:41</span>
+    <div class="status-icons">
+      <svg viewBox="0 0 17 12" width="17" height="12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="4.5" y="5.5" width="3" height="6.5" rx="1"/><rect x="9" y="3" width="3" height="9" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg>
+      <svg viewBox="0 0 16 12" width="18" height="12"><circle cx="8" cy="10.5" r="1.5" fill="#1a1a1a"/><path d="M4.5 7.5C5.5 6.4 6.7 5.8 8 5.8s2.5.6 3.5 1.7" stroke-width="1.2" fill="none" stroke="#1a1a1a" stroke-linecap="round"/><path d="M1.5 4.8C3.2 3 5.5 2 8 2s4.8 1 6.5 2.8" stroke-width="1.2" fill="none" stroke="#1a1a1a" stroke-linecap="round"/></svg>
+      <div class="battery-icon"><div class="battery-body"><div class="battery-fill"></div></div><div class="battery-nib"></div></div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- Month Nav -->
+    <div class="cal-header">
+      <button class="month-arrow">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h2 class="cal-month-title">2026년 5월</h2>
+      <button class="month-arrow">
+        <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+
+    <!-- Stats row -->
+    <div class="cal-stats">
+      <div class="cal-stat">
+        <span class="cal-stat-num">6</span>
+        <span class="cal-stat-lbl">이번 달</span>
+      </div>
+      <div class="cal-stat-sep"></div>
+      <div class="cal-stat">
+        <span class="cal-stat-num">1</span>
+        <span class="cal-stat-lbl">이번 주</span>
+      </div>
+      <div class="cal-stat-sep"></div>
+      <div class="cal-stat">
+        <span class="cal-stat-num">2</span>
+        <span class="cal-stat-lbl">연속</span>
+      </div>
+    </div>
+
+    <!-- Filter pills -->
+    <div class="cal-filter">
+      <button class="filter-pill active">전체</button>
+      <button class="filter-pill">브이로그</button>
+      <button class="filter-pill">운동</button>
+      <button class="filter-pill">몸무게</button>
+    </div>
+
+    <!-- Calendar Card -->
+    <div class="cal-card">
+      <div class="weekdays">
+        <span>월</span><span>화</span><span>수</span>
+        <span>목</span><span>금</span><span>토</span><span>일</span>
+      </div>
+      <div class="cal-grid">
+        <!-- Row 1: Mon Apr 27 ~ Sun May 3 (May 1 = Friday) -->
+        <div class="cell empty"></div>
+        <div class="cell empty"></div>
+        <div class="cell empty"></div>
+        <div class="cell empty"></div>
+        <div class="cell blank"><span class="dn">1</span></div>
+        <div class="cell thumb c1"><span class="dn">2</span><div class="play"></div></div>
+        <div class="cell blank"><span class="dn">3</span></div>
+
+        <!-- Row 2: Mon May 4 ~ Sun May 10 -->
+        <div class="cell blank"><span class="dn">4</span></div>
+        <div class="cell thumb c2"><span class="dn">5</span><span class="ex-badge">R</span><div class="play"></div></div>
+        <div class="cell blank"><span class="dn">6</span></div>
+        <div class="cell thumb c3"><span class="dn">7</span><span class="ex-badge">W</span><div class="play"></div></div>
+        <div class="cell thumb c4"><span class="dn">8</span><div class="play"></div></div>
+        <div class="cell thumb c1"><span class="dn">9</span><span class="ex-badge">R</span><div class="play"></div></div>
+        <div class="cell blank"><span class="dn">10</span></div>
+
+        <!-- Row 3: Mon May 11 ~ Sun May 17 -->
+        <div class="cell blank has-ex"><span class="dn">11</span><span class="ex-badge">W</span></div>
+        <div class="cell thumb c2"><span class="dn">12</span><span class="ex-badge">R</span><div class="play"></div></div>
+        <div class="cell blank"><span class="dn">13</span></div>
+        <div class="cell thumb c3"><span class="dn">14</span><span class="ex-badge">W</span><div class="play"></div></div>
+        <div class="cell today blank"><span class="dn">15</span></div>
+        <div class="cell blank"><span class="dn">16</span></div>
+        <div class="cell blank"><span class="dn">17</span></div>
+
+        <!-- Row 4: Mon May 18 ~ Sun May 24 -->
+        <div class="cell blank"><span class="dn">18</span></div>
+        <div class="cell blank"><span class="dn">19</span></div>
+        <div class="cell blank"><span class="dn">20</span></div>
+        <div class="cell blank"><span class="dn">21</span></div>
+        <div class="cell blank"><span class="dn">22</span></div>
+        <div class="cell blank"><span class="dn">23</span></div>
+        <div class="cell blank"><span class="dn">24</span></div>
+
+        <!-- Row 5: Mon May 25 ~ Sun May 31 -->
+        <div class="cell blank"><span class="dn">25</span></div>
+        <div class="cell blank"><span class="dn">26</span></div>
+        <div class="cell blank"><span class="dn">27</span></div>
+        <div class="cell blank"><span class="dn">28</span></div>
+        <div class="cell blank"><span class="dn">29</span></div>
+        <div class="cell blank"><span class="dn">30</span></div>
+        <div class="cell blank"><span class="dn">31</span></div>
+      </div>
+    </div>
+
+    <!-- History Feed -->
+    <div class="history">
+
+      <!-- 이번 주 -->
+      <div class="week-group">
+        <div class="week-label">
+          <span>이번 주</span>
+          <div class="wl-line"></div>
+          <span class="wl-badge">1일</span>
+        </div>
+        <div class="entry-list">
+          <div class="entry-card">
+            <div class="entry-thumb c1"><div class="ep">▶</div></div>
+            <div class="entry-info">
+              <div class="entry-top">
+                <span class="entry-date">5월 14일 목</span>
+                <span class="entry-weight">58.4 kg <span class="diff down">▼ 0.3</span></span>
+              </div>
+              <div class="entry-diary">오늘 아침 일찍 일어나서 루틴 완료. 점심은 혼자 파스타 해먹었다.</div>
+              <div class="entry-ex"><span class="ex-pill">걷기 45분 · 5.2km</span></div>
+            </div>
+            <svg class="entry-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- 지난 주 -->
+      <div class="week-group">
+        <div class="week-label">
+          <span>지난 주</span>
+          <div class="wl-line"></div>
+          <span class="wl-badge">3일</span>
+        </div>
+        <div class="entry-list">
+          <div class="entry-card">
+            <div class="entry-thumb c2"><div class="ep">▶</div></div>
+            <div class="entry-info">
+              <div class="entry-top">
+                <span class="entry-date">5월 12일 화</span>
+                <span class="entry-weight">58.7 kg <span class="diff up">▲ 0.2</span></span>
+              </div>
+              <div class="entry-diary">비 오는 날 카페 작업. 생산성이 의외로 높았음.</div>
+              <div class="entry-ex"><span class="ex-pill">러닝 30분 · 4.8km</span></div>
+            </div>
+            <svg class="entry-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="entry-card">
+            <div class="entry-thumb c3"><div class="ep">▶</div></div>
+            <div class="entry-info">
+              <div class="entry-top">
+                <span class="entry-date">5월 9일 토</span>
+                <span class="entry-weight">58.5 kg <span class="diff down">▼ 0.6</span></span>
+              </div>
+              <div class="entry-diary">주말 산책 30분, 날씨 완벽. 저녁은 집밥.</div>
+              <div class="entry-ex"><span class="ex-pill">러닝 20분 · 3.1km</span></div>
+            </div>
+            <svg class="entry-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="entry-card">
+            <div class="entry-thumb c4"><div class="ep">▶</div></div>
+            <div class="entry-info">
+              <div class="entry-top">
+                <span class="entry-date">5월 7일 수</span>
+                <span class="entry-weight">59.1 kg <span class="diff up">▲ 0.4</span></span>
+              </div>
+              <div class="entry-diary">—</div>
+              <div class="entry-ex"><span class="ex-pill">걷기 60분 · 7.0km</span></div>
+            </div>
+            <svg class="entry-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2주 전 -->
+      <div class="week-group">
+        <div class="week-label">
+          <span>2주 전</span>
+          <div class="wl-line"></div>
+          <span class="wl-badge">2일</span>
+        </div>
+        <div class="entry-list">
+          <div class="entry-card">
+            <div class="entry-thumb c1"><div class="ep">▶</div></div>
+            <div class="entry-info">
+              <div class="entry-top">
+                <span class="entry-date">5월 5일 월</span>
+                <span class="entry-weight">58.8 kg <span class="diff down">▼ 0.1</span></span>
+              </div>
+              <div class="entry-diary">어린이날인데 나는 작업 중. 그래도 기분 좋음.</div>
+              <div class="entry-ex"><span class="ex-pill">러닝 35분 · 5.0km</span></div>
+            </div>
+            <svg class="entry-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="entry-card">
+            <div class="entry-thumb c2"><div class="ep">▶</div></div>
+            <div class="entry-info">
+              <div class="entry-top">
+                <span class="entry-date">5월 2일 금</span>
+                <span class="entry-weight">58.9 kg <span class="diff up">▲ 0.2</span></span>
+              </div>
+              <div class="entry-diary">퇴근 후 야경 찍으러 나갔다 옴. 클립 3개.</div>
+            </div>
+            <svg class="entry-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <div class="tab-item">
+      <div class="tab-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="14" height="11" rx="2"/><path d="M16 7l5-3v12l-5-3"/></svg></div>
+      편집
+    </div>
+    <div class="tab-item active">
+      <div class="tab-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg></div>
+      캘린더
+    </div>
+    <div class="tab-item">
+      <div class="tab-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+      몸무게
+    </div>
+  </div>
+
+</div>
+
+<script>
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>
