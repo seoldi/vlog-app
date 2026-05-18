@@ -2243,3 +2243,64 @@ body {
     color: #fff;
     letter-spacing: -0.4px;
 }
+
+/* ── 데이터 닷 (캘린더 셀) ── */
+.cell.has-data { position: relative; }
+.cell .data-dot {
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    background: var(--black);
+    border-radius: 50%;
+}
+.cell.today .data-dot { background: var(--black); }
+
+/* ── 히스토리 빈 상태 ── */
+.history-empty {
+    padding: 40px 16px;
+    text-align: center;
+    color: var(--gray-5);
+    font-size: 14px;
+}
+
+/* ── 운동 추가 폼 ── */
+.ex-form {
+    padding: 12px;
+    background: var(--gray-9);
+    border-radius: var(--radius-sm);
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.ex-form-row {
+    display: flex;
+    gap: 8px;
+}
+.ex-form-row select,
+.ex-form-row input {
+    padding: 8px 10px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    background: #fff;
+    min-width: 0;
+}
+.ex-form-row select { flex: 1; }
+.ex-form-row input  { width: 64px; text-align: center; }
+.ef-cancel, .ef-save {
+    flex: 1;
+    padding: 9px 0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+}
+.ef-cancel { background: #fff; color: var(--text-2); border: 1.5px solid var(--border); }
+.ef-save   { background: var(--black); color: #fff; }

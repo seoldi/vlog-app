@@ -238,9 +238,194 @@
 
 </div>
 
+<script src="store.js"></script>
 <script src="app.js"></script>
 <script>
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(() => {});
+</script>
+<script>
+(function() {
+  const today = Store.today();
+  const [ty, tm] = today.split('-').map(Number);
+  let viewYear = ty, viewMonth = tm;
+
+  function padZ(n) { return String(n).padStart(2, '0'); }
+
+  function hasAnyData(v) {
+    return v && (v.weight != null || v.diary || (v.exercises && v.exercises.length));
+  }
+
+  function renderAll() {
+    document.querySelector('.cal-month-title').textContent = viewYear + '년 ' + viewMonth + '월';
+    renderStats();
+    renderGrid();
+    renderHistory();
+  }
+
+  function renderStats() {
+    const all = Store.getAll();
+    const ym = viewYear + '-' + padZ(viewMonth);
+    const monthCount = Object.keys(all).filter(d => d.startsWith(ym) && hasAnyData(all[d])).length;
+
+    const t = new Date(today + 'T00:00:00');
+    const dow = t.getDay() === 0 ? 6 : t.getDay() - 1;
+    const wStart = new Date(t);
+    wStart.setDate(t.getDate() - dow);
+    let weekCount = 0;
+    for (let i = 0; i < 7; i++) {
+      const d2 = new Date(wStart);
+      d2.setDate(wStart.getDate() + i);
+      const s = d2.getFullYear() + '-' + padZ(d2.getMonth()+1) + '-' + padZ(d2.getDate());
+      if (all[s] && hasAnyData(all[s])) weekCount++;
+    }
+
+    let streak = 0;
+    const check = new Date(t);
+    for (let i = 0; i < 365; i++) {
+      const s = check.getFullYear() + '-' + padZ(check.getMonth()+1) + '-' + padZ(check.getDate());
+      if (all[s] && hasAnyData(all[s])) { streak++; check.setDate(check.getDate() - 1); }
+      else break;
+    }
+
+    const nums = document.querySelectorAll('.cal-stat-num');
+    nums[0].textContent = monthCount;
+    nums[1].textContent = weekCount;
+    nums[2].textContent = streak;
+  }
+
+  function renderGrid() {
+    const all = Store.getAll();
+    const firstDow = new Date(viewYear, viewMonth - 1, 1).getDay();
+    const offset = firstDow === 0 ? 6 : firstDow - 1;
+    const daysInMonth = new Date(viewYear, viewMonth, 0).getDate();
+    const grid = document.querySelector('.cal-grid');
+    let html = '';
+
+    for (let i = 0; i < offset; i++) html += '<div class="cell empty"></div>';
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = viewYear + '-' + padZ(viewMonth) + '-' + padZ(d);
+      const v = all[dateStr] || {};
+      const isToday = dateStr === today;
+      const hasEx = v.exercises && v.exercises.length > 0;
+      const hasData = hasAnyData(v);
+
+      let cls = 'cell blank';
+      if (isToday) cls += ' today';
+      if (hasData) cls += ' has-data';
+      if (hasEx) cls += ' has-ex';
+
+      let inner = '<span class="dn">' + d + '</span>';
+      if (hasEx) {
+        inner += '<span class="ex-badge">' + (v.exercises[0].type === 'running' ? 'R' : 'W') + '</span>';
+      }
+      if (hasData) inner += '<div class="data-dot"></div>';
+
+      html += '<div class="' + cls + '" data-date="' + dateStr + '">' + inner + '</div>';
+    }
+
+    const tail = (7 - ((offset + daysInMonth) % 7)) % 7;
+    for (let i = 0; i < tail; i++) html += '<div class="cell empty"></div>';
+
+    grid.innerHTML = html;
+    grid.querySelectorAll('.cell[data-date]').forEach(cell => {
+      cell.addEventListener('click', () => go('date-detail.html?date=' + cell.dataset.date));
+    });
+  }
+
+  function renderHistory() {
+    const all = Store.getAll();
+    const entries = Object.entries(all)
+      .filter(([, v]) => hasAnyData(v))
+      .sort(([a], [b]) => b.localeCompare(a));
+    const hist = document.querySelector('.history');
+
+    if (!entries.length) {
+      hist.innerHTML = '<div class="history-empty">아직 기록이 없어요.</div>';
+      return;
+    }
+
+    const t = new Date(today + 'T00:00:00');
+    const dow = t.getDay() === 0 ? 6 : t.getDay() - 1;
+    const thisWeek = new Date(t); thisWeek.setDate(t.getDate() - dow);
+    const lastWeek = new Date(thisWeek); lastWeek.setDate(thisWeek.getDate() - 7);
+    const twoWeeks = new Date(lastWeek); twoWeeks.setDate(lastWeek.getDate() - 7);
+
+    function weekLabel(dateStr) {
+      const d = new Date(dateStr + 'T00:00:00');
+      if (d >= thisWeek) return '이번 주';
+      if (d >= lastWeek) return '지난 주';
+      if (d >= twoWeeks) return '2주 전';
+      return '이전';
+    }
+
+    const groups = {};
+    const ORDER = ['이번 주', '지난 주', '2주 전', '이전'];
+    entries.forEach(function(_ref) {
+      var date = _ref[0], v = _ref[1];
+      var lbl = weekLabel(date);
+      if (!groups[lbl]) groups[lbl] = [];
+      groups[lbl].push({ date: date, v: v });
+    });
+
+    const THUMBS = ['c1','c2','c3','c4'];
+    let html = '';
+    ORDER.forEach(function(lbl) {
+      if (!groups[lbl]) return;
+      html += '<div class="week-group"><div class="week-label"><span>' + lbl + '</span><div class="wl-line"></div><span class="wl-badge">' + groups[lbl].length + '일</span></div><div class="entry-list">';
+      groups[lbl].forEach(function(item, idx) {
+        var date = item.date, v = item.v;
+        var parts = date.split('-');
+        var dateLabel = parseInt(parts[1]) + '월 ' + parseInt(parts[2]) + '일 ' + Store.dayName(date);
+        var weightStr = v.weight != null ? v.weight + ' kg' : '';
+        var diaryStr = v.diary ? v.diary.replace(/\n/g, ' ').slice(0, 40) : '—';
+
+        var diffHtml = '';
+        if (v.weight != null) {
+          var prev = Object.entries(all)
+            .filter(function(e) { return e[0] < date && e[1].weight != null; })
+            .sort(function(a, b) { return b[0].localeCompare(a[0]); })[0];
+          if (prev) {
+            var diff = (v.weight - prev[1].weight).toFixed(1);
+            diffHtml = '<span class="diff ' + (diff > 0 ? 'up' : 'down') + '">' + (diff > 0 ? '▲' : '▼') + ' ' + Math.abs(diff) + '</span>';
+          }
+        }
+
+        var exHtml = '';
+        if (v.exercises && v.exercises.length) {
+          var ex = v.exercises[0];
+          var nm = ex.type === 'running' ? '러닝' : '걷기';
+          exHtml = '<div class="entry-ex"><span class="ex-pill">' + nm + (ex.duration ? ' ' + ex.duration + '분' : '') + (ex.distance ? ' · ' + ex.distance + 'km' : '') + '</span></div>';
+        }
+
+        html += '<div class="entry-card" data-date="' + date + '"><div class="entry-thumb ' + THUMBS[idx % 4] + '"><div class="ep">▶</div></div><div class="entry-info"><div class="entry-top"><span class="entry-date">' + dateLabel + '</span><span class="entry-weight">' + weightStr + ' ' + diffHtml + '</span></div><div class="entry-diary">' + diaryStr + '</div>' + exHtml + '</div><svg class="entry-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>';
+      });
+      html += '</div></div>';
+    });
+
+    hist.innerHTML = html;
+    hist.querySelectorAll('.entry-card').forEach(function(card) {
+      card.addEventListener('click', function() { go('date-detail.html?date=' + card.dataset.date); });
+    });
+  }
+
+  document.querySelectorAll('.month-arrow').forEach(function(btn, i) {
+    btn.addEventListener('click', function() {
+      if (i === 0) { viewMonth--; if (viewMonth < 1) { viewMonth = 12; viewYear--; } }
+      else         { viewMonth++; if (viewMonth > 12) { viewMonth = 1;  viewYear++; } }
+      renderAll();
+    });
+  });
+
+  document.querySelectorAll('.filter-pill').forEach(function(pill) {
+    pill.addEventListener('click', function() {
+      document.querySelectorAll('.filter-pill').forEach(function(p) { p.classList.remove('active'); });
+      pill.classList.add('active');
+    });
+  });
+
+  renderAll();
+})();
 </script>
 </body>
 </html>

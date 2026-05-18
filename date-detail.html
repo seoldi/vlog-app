@@ -195,9 +195,107 @@
 
 </div>
 
+<script src="store.js"></script>
 <script src="app.js"></script>
 <script>
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(() => {});
+</script>
+<script>
+(function() {
+  var params = new URLSearchParams(location.search);
+  var date = params.get('date') || Store.today();
+
+  document.querySelector('.nav-title').textContent = Store.formatDate(date);
+  document.querySelector('.diary-date-txt').textContent = date.replace(/-/g, '. ') + '.';
+  document.querySelector('.diary-day').textContent = Store.dayName(date) + '요일';
+
+  var weightInput = document.querySelector('.weight-val');
+  var data = Store.get(date);
+  weightInput.value = data.weight != null ? data.weight : '';
+
+  function updateWeightDiff() {
+    var all = Store.getAll();
+    var cur = parseFloat(weightInput.value);
+    var diffEl = document.querySelector('.weight-diff');
+    if (!cur) { diffEl.innerHTML = ''; return; }
+    var prev = Object.entries(all)
+      .filter(function(e) { return e[0] < date && e[1].weight != null; })
+      .sort(function(a, b) { return b[0].localeCompare(a[0]); })[0];
+    if (prev) {
+      var diff = (cur - prev[1].weight).toFixed(1);
+      diffEl.className = 'weight-diff ' + (diff > 0 ? 'up' : 'down');
+      diffEl.innerHTML = '<span>' + (diff > 0 ? '▲' : '▼') + '</span><span>' + Math.abs(diff) + ' kg</span>';
+    } else {
+      diffEl.innerHTML = '';
+    }
+  }
+
+  weightInput.addEventListener('change', function() {
+    var w = parseFloat(weightInput.value);
+    Store.set(date, { weight: isNaN(w) ? null : w });
+    updateWeightDiff();
+  });
+  updateWeightDiff();
+
+  var diaryArea = document.querySelector('.diary-textarea');
+  diaryArea.value = data.diary || '';
+  diaryArea.addEventListener('input', function() { Store.set(date, { diary: diaryArea.value }); });
+
+  var ICONS = {
+    running: '<svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.5"/><path d="M6 9l3 1 2 5 2-3 3 3"/><path d="M9 10l-2 4"/><path d="M15 10l2 4"/></svg>',
+    walking: '<svg viewBox="0 0 24 24"><circle cx="12" cy="4" r="1.5"/><path d="M9 8l3 2 3-2"/><path d="M12 10v5"/><path d="M9 21l3-6 3 6"/></svg>'
+  };
+
+  function renderExercises() {
+    var exercises = Store.get(date).exercises || [];
+    var list = document.querySelector('.exercise-list');
+    if (!exercises.length) { list.innerHTML = ''; return; }
+    list.innerHTML = exercises.map(function(ex, i) {
+      var nm = ex.type === 'running' ? '러닝' : '걷기';
+      return '<div class="exercise-item"><div class="ex-type-icon">' + (ICONS[ex.type] || ICONS.walking) + '</div><div class="ex-info"><div class="ex-name">' + nm + '</div></div><div class="ex-stats">' +
+        (ex.distance ? '<div class="ex-stat-item"><span class="ex-stat-val">' + ex.distance + '</span><span class="ex-stat-unit">km</span></div>' : '') +
+        (ex.duration ? '<div class="ex-stat-item"><span class="ex-stat-val">' + ex.duration + '</span><span class="ex-stat-unit">min</span></div>' : '') +
+        '</div><button onclick="window._delEx(' + i + ')" style="background:none;border:none;color:#aaa;font-size:20px;cursor:pointer;padding:0 8px;line-height:1;flex-shrink:0;">×</button></div>';
+    }).join('');
+  }
+
+  window._delEx = function(idx) {
+    var exs = Store.get(date).exercises || [];
+    exs.splice(idx, 1);
+    Store.set(date, { exercises: exs });
+    renderExercises();
+  };
+
+  renderExercises();
+
+  document.querySelector('.ex-add-btn').addEventListener('click', function() {
+    if (document.querySelector('.ex-form')) return;
+    var form = document.createElement('div');
+    form.className = 'ex-form';
+    form.innerHTML =
+      '<div class="ex-form-row">' +
+        '<select class="ef-type"><option value="walking">걷기</option><option value="running">러닝</option></select>' +
+        '<input class="ef-dur" type="number" placeholder="분" min="1" max="300">' +
+        '<input class="ef-dist" type="number" placeholder="km" step="0.1" min="0">' +
+      '</div>' +
+      '<div class="ex-form-row">' +
+        '<button class="ef-cancel">취소</button>' +
+        '<button class="ef-save">추가</button>' +
+      '</div>';
+    this.insertAdjacentElement('beforebegin', form);
+    form.querySelector('.ef-cancel').onclick = function() { form.remove(); };
+    form.querySelector('.ef-save').onclick = function() {
+      var type = form.querySelector('.ef-type').value;
+      var duration = parseInt(form.querySelector('.ef-dur').value) || 0;
+      var distance = parseFloat(form.querySelector('.ef-dist').value) || 0;
+      var exs = Store.get(date).exercises || [];
+      exs.push({ type: type, duration: duration, distance: distance });
+      Store.set(date, { exercises: exs });
+      form.remove();
+      renderExercises();
+    };
+  });
+})();
 </script>
 </body>
 </html>

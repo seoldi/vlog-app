@@ -198,9 +198,73 @@
 
 </div>
 
+<script src="store.js"></script>
 <script src="app.js"></script>
 <script>
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(() => {});
+</script>
+<script>
+(function() {
+  function padZ(n) { return String(n).padStart(2, '0'); }
+  var records = Store.weightRecords();
+  var now = new Date();
+  var ym = now.getFullYear() + '-' + padZ(now.getMonth() + 1);
+
+  if (records.length) {
+    var latest = records[0].weight;
+    var mRecs = records.filter(function(r) { return r.date.startsWith(ym); });
+    var minW = Math.min.apply(null, records.map(function(r) { return r.weight; }));
+
+    var vals = document.querySelectorAll('.sum-card-val');
+    if (vals[0]) vals[0].textContent = latest;
+    if (vals[1] && mRecs.length > 1) {
+      var mDiff = (mRecs[0].weight - mRecs[mRecs.length-1].weight).toFixed(1);
+      vals[1].textContent = (mDiff > 0 ? '▲ ' : '▼ ') + Math.abs(mDiff);
+      vals[1].style.color = mDiff > 0 ? '#e53e3e' : 'var(--green)';
+    }
+    if (vals[2]) vals[2].textContent = minW;
+
+    if (records.length > 1) {
+      var total = (latest - records[records.length-1].weight).toFixed(1);
+      var el = document.querySelector('.sum-change');
+      if (el) {
+        el.className = 'sum-change' + (total <= 0 ? ' accent-down' : '');
+        el.textContent = (total > 0 ? '▲' : '▼') + ' ' + Math.abs(total) + ' kg';
+      }
+    }
+  }
+
+  var card = document.querySelector('.records-card');
+  var countEl = card.querySelector('.records-count');
+  card.querySelectorAll('.record-row').forEach(function(r) { r.remove(); });
+  countEl.textContent = '이번달 ' + records.filter(function(r) { return r.date.startsWith(ym); }).length + '일';
+
+  if (!records.length) {
+    var empty = document.createElement('div');
+    empty.className = 'history-empty';
+    empty.textContent = '아직 기록이 없어요.';
+    card.appendChild(empty);
+    return;
+  }
+
+  records.forEach(function(rec, i) {
+    var prev = records[i + 1];
+    var diffHtml = '';
+    if (prev) {
+      var diff = (rec.weight - prev.weight).toFixed(1);
+      diffHtml = '<span class="record-diff ' + (diff > 0 ? 'up' : 'down') + '">' + (diff > 0 ? '▲' : '▼') + ' ' + Math.abs(diff) + '</span>';
+    }
+    var parts = rec.date.split('-');
+    var row = document.createElement('div');
+    row.className = 'record-row';
+    row.innerHTML =
+      '<div class="record-dot"></div>' +
+      '<span class="record-date">' + parseInt(parts[1]) + '월 ' + parseInt(parts[2]) + '일<span class="day-label">' + Store.dayName(rec.date) + '</span></span>' +
+      '<span class="record-kg">' + rec.weight + ' kg</span>' +
+      diffHtml;
+    card.appendChild(row);
+  });
+})();
 </script>
 </body>
 </html>
