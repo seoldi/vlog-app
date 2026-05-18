@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     card.addEventListener('click', () => go('edit-clips.html'));
   });
   const fab = document.querySelector('.fab');
-  if (fab) fab.addEventListener('click', () => go('edit-clips.html'));
+  if (fab) fab.addEventListener('click', () => go('edit-clips.html?date=' + Store.today()));
 
   /* ── 클립 편집 ── */
   document.querySelectorAll('.clip-card').forEach(card => {

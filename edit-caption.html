@@ -93,9 +93,138 @@
 
 </div>
 <script src="store.js"></script>
+<script src="video-store.js"></script>
 <script src="app.js"></script>
 <script>
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(() => {});
+</script>
+<script>
+(async function() {
+  var params = new URLSearchParams(location.search);
+  var date = params.get('date') || Store.today();
+  var clipId = params.get('clipId');
+
+  function replaceBtn(sel, handler) {
+    var el = document.querySelector(sel);
+    if (!el) return;
+    var clone = el.cloneNode(true);
+    el.parentNode.replaceChild(clone, el);
+    clone.addEventListener('click', handler);
+  }
+
+  replaceBtn('.back-btn-dark', function() { go('edit-clips.html?date=' + date); });
+
+  if (clipId) {
+    var blob = await VideoStore.get(clipId);
+    if (blob) {
+      var objUrl = URL.createObjectURL(blob);
+      var vid = document.createElement('video');
+      vid.src = objUrl; vid.muted = true; vid.playsInline = true; vid.loop = true;
+      vid.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;';
+      var vbg = document.querySelector('.video-bg');
+      vbg.style.position = 'relative';
+      vbg.insertBefore(vid, vbg.firstChild);
+      vbg.addEventListener('click', function() { vid.paused ? vid.play() : vid.pause(); });
+    }
+
+    var clips = Store.get(date).clips || [];
+    var clip = clips.find(function(c) { return c.id === clipId; });
+    var clipIdx = clips.indexOf(clip);
+
+    document.querySelector('.nav-title-dark').textContent = '자막 편집 · CLIP ' + String((clipIdx >= 0 ? clipIdx : 0) + 1).padStart(2,'0');
+
+    if (clip) {
+      if (clip.captionType === 'narr') {
+        document.querySelectorAll('.template-btn')[0].classList.remove('active');
+        document.querySelectorAll('.template-btn')[1].classList.add('active');
+        switchToNarr(clip.caption || '');
+      } else {
+        setTimeCaption(clip.caption || '');
+      }
+    }
+
+    function setTimeCaption(caption) {
+      document.querySelector('.caption-text-preview').textContent = caption || '오전 7:30';
+      if (caption) {
+        var parts = caption.split(' ');
+        var ampm = parts[0] || '오전';
+        var timeParts = (parts[1] || '7:30').split(':');
+        var sels = document.querySelectorAll('.time-sel');
+        if (sels.length >= 3) {
+          sels[0].value = ampm;
+          sels[1].value = timeParts[0] || '7';
+          sels[2].value = timeParts[1] || '30';
+        }
+      }
+    }
+
+    function switchToNarr(text) {
+      var inputCard = document.querySelector('.input-card');
+      inputCard.innerHTML =
+        '<div class="input-label">나레이션 입력</div>' +
+        '<textarea class="narr-input" placeholder="짧은 한 줄 메모" style="width:100%;padding:8px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;resize:none;height:60px;box-sizing:border-box;">' + text + '</textarea>';
+      document.querySelector('.caption-text-preview').textContent = text;
+      document.querySelector('.input-card').addEventListener('input', updatePreview);
+    }
+
+    function switchToTime() {
+      var inputCard = document.querySelector('.input-card');
+      inputCard.innerHTML =
+        '<div class="input-label">시간 입력</div>' +
+        '<div class="time-inputs">' +
+          '<select class="time-sel"><option>오전</option><option>오후</option></select>' +
+          '<select class="time-sel"><option>6</option><option>7</option><option selected>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select>' +
+          '<span class="time-colon">:</span>' +
+          '<select class="time-sel"><option selected>30</option><option>00</option><option>15</option><option>45</option></select>' +
+        '</div>';
+      document.querySelector('.caption-text-preview').textContent = '오전 7:30';
+      document.querySelector('.input-card').addEventListener('change', updatePreview);
+    }
+
+    function updatePreview() {
+      var activeIdx = Array.from(document.querySelectorAll('.template-btn')).findIndex(function(b) { return b.classList.contains('active'); });
+      var preview = document.querySelector('.caption-text-preview');
+      if (activeIdx === 0) {
+        var sels = document.querySelectorAll('.time-sel');
+        if (sels.length >= 3) preview.textContent = sels[0].value + ' ' + sels[1].value + ':' + sels[2].value;
+      } else {
+        var narr = document.querySelector('.narr-input');
+        if (narr) preview.textContent = narr.value;
+      }
+    }
+
+    document.querySelector('.input-card').addEventListener('change', updatePreview);
+    document.querySelector('.input-card').addEventListener('input', updatePreview);
+
+    document.querySelectorAll('.template-btn').forEach(function(btn, idx) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.template-btn').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        if (idx === 0) switchToTime(); else switchToNarr('');
+      });
+    });
+
+    function saveCaption() {
+      var activeIdx = Array.from(document.querySelectorAll('.template-btn')).findIndex(function(b) { return b.classList.contains('active'); });
+      var type, caption;
+      if (activeIdx === 0) {
+        var sels = document.querySelectorAll('.time-sel');
+        type = 'time';
+        caption = sels.length >= 3 ? sels[0].value + ' ' + sels[1].value + ':' + sels[2].value : '';
+      } else {
+        var narr = document.querySelector('.narr-input');
+        type = 'narr'; caption = narr ? narr.value : '';
+      }
+      var updatedClips = Store.get(date).clips || [];
+      var cidx = updatedClips.findIndex(function(c) { return c.id === clipId; });
+      if (cidx !== -1) { updatedClips[cidx].captionType = type; updatedClips[cidx].caption = caption; }
+      Store.set(date, { clips: updatedClips });
+    }
+
+    replaceBtn('.save-btn-dark', function() { saveCaption(); go('edit-clips.html?date=' + date); });
+    replaceBtn('.done-btn', function() { saveCaption(); go('edit-clips.html?date=' + date); });
+  }
+})();
 </script>
 </body>
 </html>
