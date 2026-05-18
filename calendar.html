@@ -300,6 +300,7 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js', { up
     const daysInMonth = new Date(viewYear, viewMonth, 0).getDate();
     const grid = document.querySelector('.cal-grid');
     let html = '';
+    var thumbMap = {};
 
     for (let i = 0; i < offset; i++) html += '<div class="cell empty"></div>';
 
@@ -308,26 +309,38 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js', { up
       const v = all[dateStr] || {};
       const isToday = dateStr === today;
       const hasEx = v.exercises && v.exercises.length > 0;
-      const hasData = hasAnyData(v);
+      const badge = hasEx ? (v.exercises[0].type === 'running' ? 'R' : 'W') : '';
 
-      let cls = 'cell blank';
-      if (isToday) cls += ' today';
-      if (hasData) cls += ' has-data';
-      if (hasEx) cls += ' has-ex';
-
-      let inner = '<span class="dn">' + d + '</span>';
-      if (hasEx) {
-        inner += '<span class="ex-badge">' + (v.exercises[0].type === 'running' ? 'R' : 'W') + '</span>';
+      if (v.thumb) {
+        thumbMap[dateStr] = v.thumb;
+        let cls = 'cell thumb';
+        if (isToday) cls += ' today';
+        let inner = '<span class="dn" style="color:rgba(255,255,255,0.85);text-shadow:0 1px 3px rgba(0,0,0,.6)">' + d + '</span>';
+        if (hasEx) inner += '<span class="ex-badge">' + badge + '</span>';
+        inner += '<div class="play"></div>';
+        html += '<div class="' + cls + '" data-date="' + dateStr + '">' + inner + '</div>';
+      } else {
+        const hasData = hasAnyData(v);
+        let cls = 'cell blank';
+        if (isToday) cls += ' today';
+        if (hasData) cls += ' has-data';
+        let inner = '<span class="dn">' + d + '</span>';
+        if (hasEx) inner += '<span class="ex-badge">' + badge + '</span>';
+        if (hasData) inner += '<div class="data-dot"></div>';
+        html += '<div class="' + cls + '" data-date="' + dateStr + '">' + inner + '</div>';
       }
-      if (hasData) inner += '<div class="data-dot"></div>';
-
-      html += '<div class="' + cls + '" data-date="' + dateStr + '">' + inner + '</div>';
     }
 
     const tail = (7 - ((offset + daysInMonth) % 7)) % 7;
     for (let i = 0; i < tail; i++) html += '<div class="cell empty"></div>';
 
     grid.innerHTML = html;
+
+    Object.keys(thumbMap).forEach(function(dateStr) {
+      var cell = grid.querySelector('[data-date="' + dateStr + '"]');
+      if (cell) { cell.style.backgroundImage = 'url(' + thumbMap[dateStr] + ')'; cell.style.backgroundSize = 'cover'; cell.style.backgroundPosition = 'center'; }
+    });
+
     grid.querySelectorAll('.cell[data-date]').forEach(cell => {
       cell.addEventListener('click', () => go('date-detail.html?date=' + cell.dataset.date));
     });
