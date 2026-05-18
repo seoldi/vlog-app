@@ -1,4 +1,4 @@
-const CACHE = 'vlog-v2';
+const CACHE = 'vlog-v3';
 const ASSETS = [
   './calendar.html',
   './date-detail.html',
