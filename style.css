@@ -57,6 +57,13 @@ body {
     font-family: "Urbanist", "Apple SD Gothic Neo", sans-serif;
 }
 
+/* ── Page transition ── */
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.phone { animation: page-in 0.18s ease; }
+
 /* ── Phone Shell ── */
 .phone {
     width: 390px;
