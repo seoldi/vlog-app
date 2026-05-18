@@ -7,8 +7,16 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* ── 뒤로가기 ── */
+  const BACK_MAP = {
+    'date-detail.html': 'calendar.html',
+    'edit-clips.html':  'edit-home.html',
+    'edit-caption.html':'edit-clips.html',
+  };
   document.querySelectorAll('.back-btn, .back-btn-dark').forEach(btn => {
-    btn.addEventListener('click', () => history.back());
+    btn.addEventListener('click', () => {
+      const page = location.pathname.split('/').pop();
+      go(BACK_MAP[page] || 'calendar.html');
+    });
   });
 
   /* ── 캘린더 ── */
