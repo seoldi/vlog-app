@@ -18,7 +18,7 @@
   <div class="video-preview">
     <div class="video-bg">
       <div class="caption-overlay">
-        <div class="caption-text-preview">오전 7:30</div>
+        <div class="ct-time"><span class="ct-ampm">오전</span><span class="ct-clock">7:30</span></div>
       </div>
     </div>
     <div class="video-nav">
@@ -143,12 +143,22 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js', { up
       }
     }
 
+    function renderPreview(type, a, b) {
+      var overlay = document.querySelector('.caption-overlay');
+      if (type === 'time') {
+        overlay.innerHTML = '<div class="ct-time"><span class="ct-ampm">' + (a||'오전') + '</span><span class="ct-clock">' + (b||'7:30') + '</span></div>';
+      } else {
+        overlay.innerHTML = '<div class="ct-narr"><span class="ct-narr-text">' + (a||'') + '</span></div>';
+      }
+    }
+
     function setTimeCaption(caption) {
-      document.querySelector('.caption-text-preview').textContent = caption || '오전 7:30';
+      var parts = (caption || '오전 7:30').split(' ');
+      var ampm = parts[0] || '오전';
+      var timePart = parts[1] || '7:30';
+      renderPreview('time', ampm, timePart);
       if (caption) {
-        var parts = caption.split(' ');
-        var ampm = parts[0] || '오전';
-        var timeParts = (parts[1] || '7:30').split(':');
+        var timeParts = timePart.split(':');
         var sels = document.querySelectorAll('.time-sel');
         if (sels.length >= 3) {
           sels[0].value = ampm;
@@ -163,7 +173,7 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js', { up
       inputCard.innerHTML =
         '<div class="input-label">나레이션 입력</div>' +
         '<textarea class="narr-input" placeholder="짧은 한 줄 메모" style="width:100%;padding:8px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;resize:none;height:60px;box-sizing:border-box;">' + text + '</textarea>';
-      document.querySelector('.caption-text-preview').textContent = text;
+      renderPreview('narr', text);
       document.querySelector('.input-card').addEventListener('input', updatePreview);
     }
 
@@ -177,19 +187,18 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js', { up
           '<span class="time-colon">:</span>' +
           '<select class="time-sel"><option selected>30</option><option>00</option><option>15</option><option>45</option></select>' +
         '</div>';
-      document.querySelector('.caption-text-preview').textContent = '오전 7:30';
+      renderPreview('time', '오전', '7:30');
       document.querySelector('.input-card').addEventListener('change', updatePreview);
     }
 
     function updatePreview() {
       var activeIdx = Array.from(document.querySelectorAll('.template-btn')).findIndex(function(b) { return b.classList.contains('active'); });
-      var preview = document.querySelector('.caption-text-preview');
       if (activeIdx === 0) {
         var sels = document.querySelectorAll('.time-sel');
-        if (sels.length >= 3) preview.textContent = sels[0].value + ' ' + sels[1].value + ':' + sels[2].value;
+        if (sels.length >= 3) renderPreview('time', sels[0].value, sels[1].value + ':' + sels[2].value);
       } else {
         var narr = document.querySelector('.narr-input');
-        if (narr) preview.textContent = narr.value;
+        renderPreview('narr', narr ? narr.value : '');
       }
     }
 

@@ -1850,12 +1850,45 @@ body {
     padding: 0 10px;
 }
 
-.caption-text-preview {
-    font-size: 13px;
+/* ── 자막 템플릿 — 시간형 ── */
+.ct-time {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+    gap: 2px;
+}
+.ct-ampm {
+    font-size: 11px;
     font-weight: 700;
-    color: #fff;
-    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.7);
-    letter-spacing: 0.5px;
+    color: rgba(255, 255, 255, 0.7);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+.ct-clock {
+    font-size: 52px;
+    font-weight: 900;
+    color: #c8ff00;
+    letter-spacing: -2px;
+    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.45);
+    font-family: 'Urbanist', sans-serif;
+    line-height: 1;
+}
+
+/* ── 자막 템플릿 — 나레이션 ── */
+.ct-narr {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.88);
+    padding: 7px 18px;
+    border-radius: 20px;
+    backdrop-filter: blur(6px);
+}
+.ct-narr-text {
+    font-size: 15px;
+    font-weight: 700;
+    color: #111;
+    letter-spacing: -0.3px;
+    white-space: pre-wrap;
 }
 
 .video-nav {
