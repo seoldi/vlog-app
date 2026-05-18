@@ -152,6 +152,56 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js', { up
   function setClips(clips) { Store.set(date, { clips: clips }); }
   function fmt(sec) { return Math.floor(sec/60) + ':' + String(Math.round(sec)%60).padStart(2,'0'); }
 
+  var _dragCard = null, _dragClone = null, _dragOffsetY = 0;
+
+  function onDragMove(e) {
+    if (!_dragClone) return;
+    e.preventDefault();
+    var touch = e.touches[0];
+    _dragClone.style.top = (touch.clientY - _dragOffsetY) + 'px';
+    var cards = Array.from(content.querySelectorAll('.clip-card'));
+    var target = null;
+    cards.forEach(function(card) {
+      if (card === _dragCard) return;
+      var r = card.getBoundingClientRect();
+      if (touch.clientY >= r.top && touch.clientY <= r.bottom) target = card;
+    });
+    if (target) {
+      var fromIdx = cards.indexOf(_dragCard);
+      var toIdx = cards.indexOf(target);
+      if (fromIdx < toIdx) target.insertAdjacentElement('afterend', _dragCard);
+      else target.insertAdjacentElement('beforebegin', _dragCard);
+    }
+  }
+
+  function onDragEnd() {
+    document.removeEventListener('touchmove', onDragMove);
+    if (_dragClone) { _dragClone.remove(); _dragClone = null; }
+    if (_dragCard) { _dragCard.style.opacity = ''; _dragCard = null; }
+    var newOrder = Array.from(content.querySelectorAll('.clip-card')).map(function(c) { return c.dataset.clipId; });
+    var clipMap = {};
+    getClips().forEach(function(c) { clipMap[c.id] = c; });
+    setClips(newOrder.filter(function(id) { return clipMap[id]; }).map(function(id) { return clipMap[id]; }));
+    renderClips();
+  }
+
+  function setupDragSort() {
+    content.querySelectorAll('.drag-handle').forEach(function(handle) {
+      handle.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        _dragCard = handle.closest('.clip-card');
+        var rect = _dragCard.getBoundingClientRect();
+        _dragOffsetY = e.touches[0].clientY - rect.top;
+        _dragClone = _dragCard.cloneNode(true);
+        _dragClone.style.cssText = 'position:fixed;left:' + rect.left + 'px;top:' + rect.top + 'px;width:' + rect.width + 'px;z-index:9999;opacity:0.85;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.3);border-radius:12px;transition:none;';
+        document.body.appendChild(_dragClone);
+        _dragCard.style.opacity = '0.3';
+        document.addEventListener('touchmove', onDragMove, { passive: false });
+        document.addEventListener('touchend', onDragEnd, { once: true });
+      }, { passive: false });
+    });
+  }
+
   async function renderClips() {
     content.querySelectorAll('.clip-card').forEach(function(c) { c.remove(); });
     var clips = getClips();
@@ -216,6 +266,7 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js', { up
 
     var pVal = content.querySelector('.p-val');
     if (pVal) pVal.textContent = fmt(totalSec) + ' · 9:16 릴스';
+    setupDragSort();
   }
 
   content.addEventListener('click', async function(e) {

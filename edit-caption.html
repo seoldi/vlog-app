@@ -29,12 +29,7 @@
   </div>
 
   <!-- Clip strip -->
-  <div class="clip-strip">
-    <div class="clip-pip cp1 active"><span class="clip-pip-num">1</span></div>
-    <div class="clip-pip cp2"><span class="clip-pip-num">2</span></div>
-    <div class="clip-pip cp3"><span class="clip-pip-num">3</span></div>
-    <div class="clip-pip cp4"><span class="clip-pip-num">4</span></div>
-  </div>
+  <div class="clip-strip" id="clip-strip"></div>
 
   <!-- Bottom panel -->
   <div class="bottom-panel">
@@ -132,6 +127,24 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js', { up
     var clipIdx = clips.indexOf(clip);
 
     document.querySelector('.nav-title-dark').textContent = '자막 편집 · CLIP ' + String((clipIdx >= 0 ? clipIdx : 0) + 1).padStart(2,'0');
+
+    var strip = document.getElementById('clip-strip');
+    if (clips.length <= 1) {
+      strip.style.display = 'none';
+    } else {
+      clips.forEach(function(c, i) {
+        var pip = document.createElement('div');
+        pip.className = 'clip-pip cp' + ((i % 4) + 1) + (i === clipIdx ? ' active' : '');
+        pip.innerHTML = '<span class="clip-pip-num">' + (i + 1) + '</span>';
+        if (i !== clipIdx) {
+          pip.style.cursor = 'pointer';
+          (function(cId) {
+            pip.addEventListener('click', function() { go('edit-caption.html?date=' + date + '&clipId=' + cId); });
+          })(c.id);
+        }
+        strip.appendChild(pip);
+      });
+    }
 
     if (clip) {
       if (clip.captionType === 'narr') {
